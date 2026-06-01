@@ -1,0 +1,8 @@
+.env
+.env.*
+*.local
+n8n-credentials*.json
+credentials*.json
+api_keys*.txt
+.DS_Store
+Thumbs.db
