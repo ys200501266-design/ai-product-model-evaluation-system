@@ -1,0 +1,1 @@
+case_id,scenario,task_type,difficulty,provider,model_id,prompt,answer,latency_ms,api_status,api_error,task_success,instruction_following,factuality,structure_stability,user_usefulness,safety_compliance,cost_latency,total_score,error_type,risk_level,judge_reason,product_recommendation,human_review_required

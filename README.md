@@ -1,55 +1,131 @@
 # 面向 AI 产品选型的中文大模型评测系统
 
-这是一个面向 AI 产品经理作品集的 n8n 项目模板。它不是“大模型排行榜”，而是用真实产品场景判断不同中文大模型是否适合某类 AI 产品落地。
+本项目模拟 AI 产品经理在真实业务场景下进行大模型选型的流程，围绕 AI 求职助手、AI 文档助手、AI 客服助手、AI 产品经理助手、结构化信息处理、可靠性与安全等 6 类场景，设计 36 道中文场景化测试任务，并基于 n8n 搭建多模型并行评测工作流。
 
-## 项目价值
+项目结合程序规则校验、LLM-as-Judge 辅助评分、人工抽检机制、响应速度与失败率统计，最终用于输出模型能力画像和产品选型建议。
 
-公开排行榜只能回答“哪个模型分数更高”。产品选型更关心：在 AI 求职助手、AI 文档助手、AI 客服助手、AI 产品经理助手、结构化信息处理、可靠性与安全等场景里，模型是否稳定、可控、可用、便宜、响应快。
+## 项目定位
 
-## 测评对象与变量
+本项目不是大模型排行榜，而是面向 AI 产品经理模型选型决策的评测系统。它关注的是“某个模型是否适合某个具体 AI 产品场景”，而不是简单判断“哪个模型绝对最强”。
 
-- DeepSeek：`DEEPSEEK_API_KEY`、`DEEPSEEK_BASE_URL`、`DEEPSEEK_MODEL`
-- Qwen：`QWEN_API_KEY`、`QWEN_BASE_URL`、`QWEN_MODEL`
-- Kimi：`KIMI_API_KEY`、`KIMI_BASE_URL`、`KIMI_MODEL`
-- Doubao：`DOUBAO_API_KEY`、`DOUBAO_BASE_URL`、`DOUBAO_MODEL`
-- Zhipu GLM：`ZHIPU_API_KEY`、`ZHIPU_BASE_URL`、`ZHIPU_MODEL`
-- Baidu Qianfan：`QIANFAN_API_KEY`、`QIANFAN_BASE_URL`、`QIANFAN_MODEL`
-- Judge：`JUDGE_API_KEY`、`JUDGE_BASE_URL`、`JUDGE_MODEL`
+## 为什么做这个项目
 
-不要写死真实 API Key，不要上传 GitHub。模型名可能变化，请到各平台控制台复制最新模型 ID。ChatGPT Plus 不等于 API 免费额度，API 通常需要单独开通或充值。
+公开排行榜只能提供通用参考，但产品经理实际选型更关注具体场景下的稳定性、可控性、可用性、成本、速度、失败率和安全风险。一个模型在通用榜单上表现较好，并不代表它一定适合客服、求职、文档抽取或安全拒答等真实产品场景。
 
-## 文件说明
+## 测评对象
 
-- `workflow.json`：n8n 工作流模板。
-- `scenario_test_cases.csv`：36 道场景化测试任务。
-- `manual_build_guide.md`：导入失败时的手动搭建步骤。
-- `portfolio_writeup.md`：作品集文案、简历文案、1 分钟面试讲解。
+- DeepSeek
+- Qwen
+- Kimi / Moonshot
+- Doubao / 火山方舟
+- Zhipu GLM
+- Baidu Qianfan
 
-## 使用步骤
+## 场景化任务集
 
-1. 在 n8n 导入 `workflow.json`。
-2. 配置上方环境变量。
-3. 先用 1 条测试任务跑通 DeepSeek 或任一模型。
-4. 再开启 6 个模型完整评测。
-5. 查看 `Generate Product Evaluation Report` 节点输出的 Markdown 报告。
+任务集位于 `dataset/scenario_test_cases.csv`。共 6 个场景，每个场景 6 道任务，共 36 道任务：
+
+- AI 求职助手
+- AI 文档助手
+- AI 客服助手
+- AI 产品经理助手
+- 结构化信息处理
+- 可靠性与安全
+
+## 评测方法
+
+- 场景化任务集：用真实 AI 产品使用场景替代抽象考试题。
+- 程序规则校验：检查 JSON、表格、字数、禁用词、必填字段、空回答和 API 失败。
+- LLM-as-Judge 辅助评分：辅助判断开放式回答质量，但不作为最终权威结论。
+- 人工抽检方案：建议抽检 20% 样本，覆盖高分、低分、争议和安全相关样本。
+- 响应速度、失败率、成本字段统计：记录 `latency_ms`、`api_status`、`api_error`、token 估算和成本字段。
 
 ## 评分体系
 
-总分 100：task_success 25、instruction_following 15、factuality 20、structure_stability 10、user_usefulness 15、safety_compliance 5、cost_latency 10。
+总分 100 分：
 
-## 人工抽检
+- task_success：任务成功率，25 分
+- instruction_following：指令遵循，15 分
+- factuality：事实可靠性，20 分
+- structure_stability：结构化稳定性，10 分
+- user_usefulness：用户可用性，15 分
+- safety_compliance：安全合规，5 分
+- cost_latency：成本速度，10 分
 
-建议抽检 20% 样本，覆盖高分、低分、争议样本和关键场景。复核事实可靠性、用户可用性、是否符合真实业务需求。人工评分与 AI 评分冲突时，以人工复核为准，并调整 Rubric。
+## 项目结构
 
-## 常见报错
+```text
+.
+├── README.md
+├── .gitignore
+├── workflow/
+│   └── n8n_workflow.json
+├── dataset/
+│   └── scenario_test_cases.csv
+├── docs/
+│   ├── manual_build_guide.md
+│   ├── portfolio_writeup.md
+│   ├── evaluation_method.md
+│   └── human_review_template.md
+├── report/
+│   ├── model_evaluation_report.md
+│   ├── evaluation_results_template.csv
+│   └── product_selection_summary.md
+├── assets/
+│   ├── README.md
+│   ├── workflow_overview_placeholder.md
+│   ├── model_parallel_nodes_placeholder.md
+│   └── evaluation_result_placeholder.md
+└── backup/
+    └── 原始文件备份
+```
 
-- 401 / 403：API Key、权限、余额或 Base URL 错误。
-- 404：模型 ID 或接口路径错误。
-- 429：限流，降低并发或增加等待时间。
-- JSON 解析失败：让评分模型只输出 JSON，temperature 设为 0。
-- 某模型失败导致流程中断：HTTP Request 节点开启 Continue On Fail。
-- 成本字段为 0：当前预留字段，后续接入真实价格表。
+## 如何运行
 
-## 简历一句话
+1. 打开 n8n。
+2. 导入 `workflow/n8n_workflow.json`。
+3. 配置 6 个模型 API Key、Base URL 和 Model 环境变量。
+4. 配置 Judge 模型 API Key、Base URL 和 Model 环境变量。
+5. 先用 1 条任务测试接口和字段解析是否正常。
+6. 再运行完整 36 道任务。
+7. 查看 `Generate Product Evaluation Report` 节点输出。
+8. 将真实运行结果整理到 `report/model_evaluation_report.md`。
+
+> 注意：不同 n8n 版本的 `Split In Batches` 循环连接可能略有差异。当前 workflow 可用于单批次验证；完整 36 题批量评测前，请确认 Split In Batches 的循环连接或根据 n8n 版本调整批处理逻辑。
+
+## API Key 安全提醒
+
+- 不要把真实 API Key 上传到 GitHub。
+- ChatGPT Plus 不等于 API 免费额度。
+- 各国内模型 API 通常需要单独开通或充值。
+- workflow 中只应保留环境变量或占位符，不应写死真实密钥。
+
+## 当前状态
+
+- 已完成 n8n workflow 设计。
+- 已完成 36 道场景化任务集。
+- 已完成规则校验与 LLM-as-Judge 评分框架。
+- 已预留成本、速度、失败率字段。
+- 真实完整评测结果需要用户接入 API 后运行，并填入 `report/model_evaluation_report.md`。
+
+## 项目局限
+
+- 样本量有限。
+- LLM-as-Judge 可能有偏差。
+- 不同模型 API 参数不完全一致。
+- 成本估算需要接入真实价格表。
+- 仍需要人工抽检和真实用户反馈。
+
+## 下一步计划
+
+- 补充真实运行截图。
+- 补充完整评测报告。
+- 扩展到 100+ 场景任务。
+- 增加可视化 Dashboard。
+- 增加 RAG 场景。
+- 增加 Agent 工具调用场景。
+- 增加真实用户满意度反馈。
+
+## 简历写法
 
 基于 n8n 搭建面向 AI 产品选型的中文大模型评测系统，接入 DeepSeek、Qwen、Kimi、豆包、智谱 GLM、百度千帆等 6 个国内主流模型，设计 36 道场景化任务集，并结合规则校验、LLM-as-Judge 辅助评分、人工抽检方案、响应速度与失败率统计，输出模型能力画像和产品选型建议。

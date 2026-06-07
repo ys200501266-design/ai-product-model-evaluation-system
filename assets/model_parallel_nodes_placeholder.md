@@ -1,0 +1,1 @@
+这里需要放 6 个模型并行调用部分截图，文件名建议为 `model_parallel_nodes.png`。

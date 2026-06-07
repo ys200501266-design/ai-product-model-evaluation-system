@@ -1,0 +1,1 @@
+这里需要放 n8n 完整 workflow 截图，文件名建议为 `workflow_overview.png`。
